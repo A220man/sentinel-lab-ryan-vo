@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinel-lab"
+version = "1.0.0"
+description = "LLM Course Platform with Roadmaps and Colab Notebooks"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Ryan Vo", email = "ryandtvo@gmail.com"}
+]
+maintainers = [
+    {name = "Ryan Vo", email = "ryandtvo@gmail.com"}
+]
+keywords = ["llm", "ai", "machine-learning", "course", "education", "colab"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.0",
+    "uvicorn[standard]==0.32.0",
+    "sqlalchemy==2.0.36",
+    "pydantic==2.10.0",
+    "pydantic-settings==2.6.1",
+    "python-jose[cryptography]==3.3.0",
+    "python-multipart==0.0.18",
+    "httpx==0.28.1",
+    "alembic==1.14.0",
+    "python-dotenv==1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "pytest-asyncio==0.23.8",
+    "httpx==0.28.1",
+    "ruff==0.6.9",
+]
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["backend"]
+testpaths = ["backend/tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+select = ["E", "F", "I", "UP", "W"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

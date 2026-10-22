@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "name": "sentinel-lab-ryan-vo",
+  "owner": "A220man",
+  "email": "ryandtvo@gmail.com",
+  "domain": "AI/ML developer tools",
+  "summary": "Work in progress: sentinel-lab-ryan-vo",
+  "workflows": [
+    "Browse and search LLM courses with modules and hands-on Colab notebooks",
+    "Follow structured learning roadmaps for LLM Engineer, ML Researcher, and AI Product Manager paths",
+    "Track progress through courses and roadmaps with personalized recommendations"
+  ],
+  "auth": "oidc-keycloak-saml-broker",
+  "llm_providers": [
+    "openai-compatible",
+    "anthropic",
+    "gemini",
+    "ollama"
+  ],
+  "status": "work-in-progress"
+}

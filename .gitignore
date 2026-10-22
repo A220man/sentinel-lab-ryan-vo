@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+*.db
+*.sqlite
+*.sqlite3
+
+# Node
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local agent metadata
+.antigravitycli/
+.omp/
+
+# Test
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# Docker
+.docker/
