@@ -304,3 +304,157 @@ class TestRoadmapEndpoints:
             json={"title": "Step 1", "course_id": 999, "order": 1},
         )
         assert response.status_code == 404
+    def test_recommend_next_step(self):
+        roadmap_response = client.post("/api/v1/roadmaps", json={"title": "Roadmap", "is_published": True})
+        roadmap_id = roadmap_response.json()["id"]
+
+        course1_response = client.post("/api/v1/courses", json={"title": "Course 1", "is_published": True})
+        course1_id = course1_response.json()["id"]
+
+        course2_response = client.post("/api/v1/courses", json={"title": "Course 2", "is_published": True})
+        course2_id = course2_response.json()["id"]
+
+        course3_response = client.post("/api/v1/courses", json={"title": "Course 3", "is_published": True})
+        course3_id = course3_response.json()["id"]
+
+        # Create steps: required course1, required course2, optional course3
+        step1_response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/steps",
+            json={"title": "Step 1", "course_id": course1_id, "order": 1, "is_required": True},
+        )
+        step1_id = step1_response.json()["id"]
+
+        step2_response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/steps",
+            json={"title": "Step 2", "course_id": course2_id, "order": 2, "is_required": True},
+        )
+        step2_id = step2_response.json()["id"]
+
+        step3_response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/steps",
+            json={"title": "Step 3", "course_id": course3_id, "order": 3, "is_required": False},
+        )
+        step3_id = step3_response.json()["id"]
+
+        # No completed steps - should recommend step 1 (course1)
+        response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/recommend",
+            json={"completed_step_ids": []},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["next_step"]["id"] == step1_id
+        assert data["next_course"]["id"] == course1_id
+        assert data["progress_percentage"] == 0.0
+        assert data["completed_steps"] == 0
+        assert data["total_steps"] == 3
+
+        # Complete step 1 - should recommend step 2 (course2)
+        response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/recommend",
+            json={"completed_step_ids": [step1_id]},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["next_step"]["id"] == step2_id
+        assert data["next_course"]["id"] == course2_id
+        assert data["progress_percentage"] == 33.33
+        assert data["completed_steps"] == 1
+
+        # Complete step 2 - should recommend step 3 (course3, optional)
+        response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/recommend",
+            json={"completed_step_ids": [step1_id, step2_id]},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["next_step"]["id"] == step3_id
+        assert data["next_course"]["id"] == course3_id
+        assert data["progress_percentage"] == 66.67
+        assert data["completed_steps"] == 2
+
+        # Complete all steps - no next step
+        response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/recommend",
+            json={"completed_step_ids": [step1_id, step2_id, step3_id]},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["next_step"] is None
+        assert data["next_course"] is None
+        assert data["progress_percentage"] == 100.0
+        assert data["completed_steps"] == 3
+
+    def test_recommend_skips_optional_when_required_remain(self):
+        roadmap_response = client.post("/api/v1/roadmaps", json={"title": "Roadmap", "is_published": True})
+        roadmap_id = roadmap_response.json()["id"]
+
+        course1_response = client.post("/api/v1/courses", json={"title": "Course 1", "is_published": True})
+        course1_id = course1_response.json()["id"]
+
+        course2_response = client.post("/api/v1/courses", json={"title": "Course 2", "is_published": True})
+        course2_id = course2_response.json()["id"]
+
+        # Optional step first, then required step
+        step1_response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/steps",
+            json={"title": "Optional Step", "course_id": course1_id, "order": 1, "is_required": False},
+        )
+        step1_id = step1_response.json()["id"]
+
+        step2_response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/steps",
+            json={"title": "Required Step", "course_id": course2_id, "order": 2, "is_required": True},
+        )
+        step2_id = step2_response.json()["id"]
+
+        # No completed - should recommend required step (step2) even though step1 is first in order
+        response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/recommend",
+            json={"completed_step_ids": []},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["next_step"]["id"] == step2_id
+        assert data["next_course"]["id"] == course2_id
+
+    def test_recommend_no_course_on_step(self):
+        roadmap_response = client.post("/api/v1/roadmaps", json={"title": "Roadmap", "is_published": True})
+        roadmap_id = roadmap_response.json()["id"]
+
+        step_response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/steps",
+            json={"title": "Step without course", "order": 1, "is_required": True},
+        )
+        step_id = step_response.json()["id"]
+
+        response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/recommend",
+            json={"completed_step_ids": []},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["next_step"]["id"] == step_id
+        assert data["next_course"] is None
+
+    def test_recommend_roadmap_not_found(self):
+        response = client.post(
+            "/api/v1/roadmaps/999/recommend",
+            json={"completed_step_ids": []},
+        )
+        assert response.status_code == 404
+
+    def test_recommend_empty_roadmap(self):
+        roadmap_response = client.post("/api/v1/roadmaps", json={"title": "Empty Roadmap", "is_published": True})
+        roadmap_id = roadmap_response.json()["id"]
+
+        response = client.post(
+            f"/api/v1/roadmaps/{roadmap_id}/recommend",
+            json={"completed_step_ids": []},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["next_step"] is None
+        assert data["next_course"] is None
+        assert data["progress_percentage"] == 100.0
+        assert data["total_steps"] == 0

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.0.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
@@ -38,3 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment variable configuration
 - Deployment and backup/restore instructions
 - License (MIT)
+### Added
+- Roadmap recommendation algorithm endpoint (`POST /api/v1/roadmaps/{roadmap_id}/recommend`)
+- Recommendation request/response schemas with progress tracking
+- Algorithm prioritizes required steps over optional steps
+- Returns next recommended step, associated course, progress percentage, and completion statistics
+- 5 new backend tests for recommendation functionality
+
