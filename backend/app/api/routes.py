@@ -13,6 +13,7 @@ from app.schemas import (
     LessonCreate, LessonUpdate, LessonResponse,
     RoadmapCreate, RoadmapUpdate, RoadmapResponse,
     RoadmapStepCreate, RoadmapStepUpdate, RoadmapStepResponse,
+    RoadmapRecommendationRequest, RoadmapRecommendationResponse,
     PaginatedResponse
 )
 
@@ -496,4 +497,76 @@ def delete_roadmap_step(step_id: int, db: Session = Depends(get_db)):
     if not step:
         raise HTTPException(status_code=404, detail="Roadmap step not found")
     db.delete(step)
-    db.commit()
+
+# Roadmap recommendation endpoint
+@router.post("/roadmaps/{roadmap_id}/recommend", response_model=RoadmapRecommendationResponse)
+def recommend_next_step(
+    roadmap_id: int,
+    request: RoadmapRecommendationRequest,
+    db: Session = Depends(get_db)
+):
+    roadmap = db.query(Roadmap).filter(Roadmap.id == roadmap_id).first()
+    if not roadmap:
+        raise HTTPException(status_code=404, detail="Roadmap not found")
+
+    # Get all steps for this roadmap ordered by order
+    all_steps = db.query(RoadmapStep).filter(
+        RoadmapStep.roadmap_id == roadmap_id
+    ).order_by(RoadmapStep.order).all()
+
+    total_steps = len(all_steps)
+    if total_steps == 0:
+        return RoadmapRecommendationResponse(
+            next_step=None,
+            next_course=None,
+            progress_percentage=100.0,
+            completed_steps=len(request.completed_step_ids),
+            total_steps=0,
+        )
+
+    # Find the next uncompleted required step
+    completed_set = set(request.completed_step_ids)
+    next_step = None
+    for step in all_steps:
+        if step.id not in completed_set and step.is_required:
+            next_step = step
+            break
+
+    # If all required steps are done, find next optional step
+    if next_step is None:
+        for step in all_steps:
+            if step.id not in completed_set:
+                next_step = step
+                break
+
+    completed_count = len([s for s in all_steps if s.id in completed_set])
+    progress = (completed_count / total_steps) * 100 if total_steps > 0 else 100.0
+
+    next_course = None
+    if next_step and next_step.course_id:
+        course = db.query(Course).filter(Course.id == next_step.course_id).first()
+        if course:
+            modules_count = db.query(Module).filter(Module.course_id == course.id).count()
+            next_course = CourseResponse(
+                id=course.id,
+                title=course.title,
+                description=course.description,
+                level=course.level,
+                thumbnail_url=course.thumbnail_url,
+                author=course.author,
+                tags=course.tags.split(",") if course.tags else None,
+                is_published=course.is_published,
+                created_at=course.created_at,
+                updated_at=course.updated_at,
+                modules_count=modules_count,
+            )
+
+    next_step_response = RoadmapStepResponse.model_validate(next_step) if next_step else None
+
+    return RoadmapRecommendationResponse(
+        next_step=next_step_response,
+        next_course=next_course,
+        progress_percentage=round(progress, 2),
+        completed_steps=completed_count,
+        total_steps=total_steps,
+    )

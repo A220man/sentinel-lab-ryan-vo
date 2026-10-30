@@ -167,3 +167,16 @@ class PaginatedResponse(BaseModel):
     page: int
     page_size: int
     total_pages: int
+class RoadmapRecommendationRequest(BaseModel):
+    completed_step_ids: List[int] = []
+
+
+class RoadmapRecommendationResponse(BaseModel):
+    next_step: Optional[RoadmapStepResponse] = None
+    next_course: Optional[CourseResponse] = None
+    progress_percentage: float = 0.0
+    completed_steps: int = 0
+    total_steps: int = 0
+
+    class Config:
+        from_attributes = True
