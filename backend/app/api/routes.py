@@ -28,16 +28,15 @@ async def health_check():
 # Course endpoints
 @router.post("/courses", response_model=CourseResponse, status_code=201)
 def create_course(course: CourseCreate, db: Session = Depends(get_db)):
-    tags_str = ",".join(course.tags) if course.tags else None
     db_course = Course(
         title=course.title,
         description=course.description,
         level=course.level,
         thumbnail_url=str(course.thumbnail_url) if course.thumbnail_url else None,
         author=course.author,
-        tags=tags_str,
         is_published=course.is_published,
     )
+    db_course.set_tags(course.tags)
     db.add(db_course)
     db.commit()
     db.refresh(db_course)
@@ -48,11 +47,11 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db)):
         level=db_course.level,
         thumbnail_url=db_course.thumbnail_url,
         author=db_course.author,
-        tags=db_course.tags.split(",") if db_course.tags else None,
+        tags=db_course.tags_list,
         is_published=db_course.is_published,
         created_at=db_course.created_at,
         updated_at=db_course.updated_at,
-        modules_count=0,
+        modules_count=db_course.modules_count,
     )
 
 
@@ -79,7 +78,6 @@ def list_courses(
 
     items = []
     for c in courses:
-        modules_count = db.query(Module).filter(Module.course_id == c.id).count()
         items.append(CourseResponse(
             id=c.id,
             title=c.title,
@@ -87,11 +85,11 @@ def list_courses(
             level=c.level,
             thumbnail_url=c.thumbnail_url,
             author=c.author,
-            tags=c.tags.split(",") if c.tags else None,
+            tags=c.tags_list,
             is_published=c.is_published,
             created_at=c.created_at,
             updated_at=c.updated_at,
-            modules_count=modules_count,
+            modules_count=c.modules_count,
         ))
 
     return PaginatedResponse(
@@ -108,7 +106,6 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
-    modules_count = db.query(Module).filter(Module.course_id == course.id).count()
     return CourseResponse(
         id=course.id,
         title=course.title,
@@ -116,11 +113,11 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
         level=course.level,
         thumbnail_url=course.thumbnail_url,
         author=course.author,
-        tags=course.tags.split(",") if course.tags else None,
+        tags=course.tags_list,
         is_published=course.is_published,
         created_at=course.created_at,
         updated_at=course.updated_at,
-        modules_count=modules_count,
+        modules_count=course.modules_count,
     )
 
 
@@ -132,7 +129,8 @@ def update_course(course_id: int, course_update: CourseUpdate, db: Session = Dep
 
     update_data = course_update.model_dump(exclude_unset=True)
     if "tags" in update_data and update_data["tags"] is not None:
-        update_data["tags"] = ",".join(update_data["tags"])
+        course.set_tags(update_data["tags"])
+        del update_data["tags"]
     if "thumbnail_url" in update_data and update_data["thumbnail_url"] is not None:
         update_data["thumbnail_url"] = str(update_data["thumbnail_url"])
 
@@ -141,7 +139,6 @@ def update_course(course_id: int, course_update: CourseUpdate, db: Session = Dep
 
     db.commit()
     db.refresh(course)
-    modules_count = db.query(Module).filter(Module.course_id == course.id).count()
     return CourseResponse(
         id=course.id,
         title=course.title,
@@ -149,11 +146,11 @@ def update_course(course_id: int, course_update: CourseUpdate, db: Session = Dep
         level=course.level,
         thumbnail_url=course.thumbnail_url,
         author=course.author,
-        tags=course.tags.split(",") if course.tags else None,
+        tags=course.tags_list,
         is_published=course.is_published,
         created_at=course.created_at,
         updated_at=course.updated_at,
-        modules_count=modules_count,
+        modules_count=course.modules_count,
     )
 
 
@@ -497,6 +494,8 @@ def delete_roadmap_step(step_id: int, db: Session = Depends(get_db)):
     if not step:
         raise HTTPException(status_code=404, detail="Roadmap step not found")
     db.delete(step)
+    db.commit()
+
 
 # Roadmap recommendation endpoint
 @router.post("/roadmaps/{roadmap_id}/recommend", response_model=RoadmapRecommendationResponse)
@@ -546,7 +545,6 @@ def recommend_next_step(
     if next_step and next_step.course_id:
         course = db.query(Course).filter(Course.id == next_step.course_id).first()
         if course:
-            modules_count = db.query(Module).filter(Module.course_id == course.id).count()
             next_course = CourseResponse(
                 id=course.id,
                 title=course.title,
@@ -554,11 +552,11 @@ def recommend_next_step(
                 level=course.level,
                 thumbnail_url=course.thumbnail_url,
                 author=course.author,
-                tags=course.tags.split(",") if course.tags else None,
+                tags=course.tags_list,
                 is_published=course.is_published,
                 created_at=course.created_at,
                 updated_at=course.updated_at,
-                modules_count=modules_count,
+                modules_count=course.modules_count,
             )
 
     next_step_response = RoadmapStepResponse.model_validate(next_step) if next_step else None
