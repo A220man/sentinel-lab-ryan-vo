@@ -1,9 +1,11 @@
+import json
 from datetime import datetime
 from enum import Enum as PyEnum
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, Boolean
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.core.database import Base
 
@@ -29,6 +31,26 @@ class Course(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     modules = relationship("Module", back_populates="course", cascade="all, delete-orphan")
+
+    @hybrid_property
+    def tags_list(self) -> List[str]:
+        if not self.tags:
+            return []
+        try:
+            return json.loads(self.tags)
+        except (json.JSONDecodeError, TypeError):
+            # Fallback for legacy comma-separated tags
+            return [tag.strip() for tag in self.tags.split(",") if tag.strip()]
+
+    def set_tags(self, tags: Optional[List[str]]) -> None:
+        if tags:
+            self.tags = json.dumps(tags)
+        else:
+            self.tags = None
+
+    @hybrid_property
+    def modules_count(self) -> int:
+        return len(self.modules) if self.modules else 0
 
 
 class Module(Base):
