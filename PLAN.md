@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-project-skeleton
+roadmap-detail-ui
 
 ## Roadmap
 
@@ -63,6 +63,22 @@ Acceptance:
 - API endpoints for roadmaps
 
 Implementation: `backend/app/models/__init__.py (Roadmap, RoadmapStep)`, `backend/app/schemas.py (RoadmapResponse, RoadmapStepResponse)`, `backend/app/api/routes.py (roadmap endpoints)`, `frontend/src/pages/RoadmapsPage.tsx`
+
+Tests: `backend/tests/test_api.py::TestRoadmapEndpoints`
+
+### roadmap-detail-ui — Roadmap detail page with progress tracking and recommendations
+
+Status: done
+
+Acceptance:
+- Roadmap detail view with step list
+- Interactive step completion tracking
+- Progress bar with percentage
+- AI-powered next step recommendation
+- Links to associated courses
+- Responsive layout with sidebar
+
+Implementation: `frontend/src/pages/RoadmapDetailPage.tsx`, `frontend/src/pages/RoadmapDetailPage.css`, `frontend/src/api/client.ts (recommendNextStep)`, `frontend/src/types/index.ts (recommendation types)`, `frontend/src/App.tsx (route)`
 
 Tests: `backend/tests/test_api.py::TestRoadmapEndpoints`
 
