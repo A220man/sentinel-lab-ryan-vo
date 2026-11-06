@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import type { Course, Module, Lesson, Roadmap, RoadmapStep, PaginatedResponse } from '../types';
+import type { Course, Module, Lesson, Roadmap, RoadmapStep, PaginatedResponse, RoadmapRecommendationRequest, RoadmapRecommendationResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
@@ -158,6 +158,12 @@ class ApiClient {
 
   async deleteRoadmapStep(id: number): Promise<void> {
     await this.client.delete(`/roadmap-steps/${id}`);
+  }
+
+  // Roadmap Recommendation
+  async recommendNextStep(roadmapId: number, request: RoadmapRecommendationRequest): Promise<RoadmapRecommendationResponse> {
+    const response = await this.client.post(`/roadmaps/${roadmapId}/recommend`, request);
+    return response.data;
   }
 
   // Health

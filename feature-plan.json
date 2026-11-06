@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "project-skeleton",
+  "current_feature": "roadmap-detail-ui",
   "features": [
     {
       "id": "project-skeleton",
@@ -83,6 +83,29 @@
         "backend/app/schemas.py (RoadmapResponse, RoadmapStepResponse)",
         "backend/app/api/routes.py (roadmap endpoints)",
         "frontend/src/pages/RoadmapsPage.tsx"
+      ],
+      "tests": [
+        "backend/tests/test_api.py::TestRoadmapEndpoints"
+      ]
+    },
+    {
+      "id": "roadmap-detail-ui",
+      "title": "Roadmap detail page with progress tracking and recommendations",
+      "status": "done",
+      "acceptance": [
+        "Roadmap detail view with step list",
+        "Interactive step completion tracking",
+        "Progress bar with percentage",
+        "AI-powered next step recommendation",
+        "Links to associated courses",
+        "Responsive layout with sidebar"
+      ],
+      "implementation": [
+        "frontend/src/pages/RoadmapDetailPage.tsx",
+        "frontend/src/pages/RoadmapDetailPage.css",
+        "frontend/src/api/client.ts (recommendNextStep)",
+        "frontend/src/types/index.ts (recommendation types)",
+        "frontend/src/App.tsx (route)"
       ],
       "tests": [
         "backend/tests/test_api.py::TestRoadmapEndpoints"

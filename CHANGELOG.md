@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.2.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
@@ -52,4 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Algorithm prioritizes required steps over optional steps
 - Returns next recommended step, associated course, progress percentage, and completion statistics
 - 5 new backend tests for recommendation functionality
+- Frontend types for RoadmapRecommendationRequest/Response
+- API client `recommendNextStep()` method
+- Route configuration in App.tsx for roadmap detail page
 
+### Changed
+- RoadmapsPage cards now link to roadmap detail pages
+- Updated PLAN.md, feature-plan.json, STATUS.md

@@ -61,14 +61,26 @@ export interface RoadmapStep {
   created_at: string;
 }
 
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
+export interface RoadmapRecommendationRequest {
+  completed_step_ids: number[];
 }
 
-export interface ApiError {
-  detail: string;
+export interface RoadmapRecommendationResponse {
+  next_step: RoadmapStep | null;
+  next_course: Course | null;
+  progress_percentage: number;
+  completed_steps: number;
+  total_steps: number;
 }
+
+ export interface PaginatedResponse<T> {
+   items: T[];
+   total: number;
+   page: number;
+   page_size: number;
+   total_pages: number;
+ }
+ 
+ export interface ApiError {
+   detail: string;
+ }
