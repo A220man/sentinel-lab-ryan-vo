@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.3.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
@@ -63,3 +67,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - RoadmapsPage cards now link to roadmap detail pages
 - Updated PLAN.md, feature-plan.json, STATUS.md
+
+### Fixed
+- Added complete CSS styles for RoadmapDetailPage (was missing - only had RoadmapsPage styles)
+  - Sidebar with roadmap metadata, progress bar, and recommendation card
+  - Main step list with interactive checkboxes, completion states, and course links
+  - Responsive layout with sticky sidebar on desktop, stacked on mobile
+  - Visual indicators for required/optional/recommended steps
+  - Progress bar animation and refresh button
