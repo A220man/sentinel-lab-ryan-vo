@@ -1,7 +1,436 @@
-.roadmaps-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .roadmap-detail-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .roadmap-detail-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .roadmap-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: sticky;
+    top: 1.5rem;
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+  }
+
+  .roadmap-meta {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+  }
+
+  .meta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .meta-item:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .meta-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+
+  .meta-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-align: right;
+  }
+
+  .progress-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+  }
+
+  .progress-section h3 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .progress-bar-container {
+    height: 12px;
+    background: var(--color-background);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+  }
+
+  .progress-text {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  .refresh-btn {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .refresh-btn:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+  }
+
+  .refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .recommendation-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+  }
+
+  .recommendation-card.complete {
+    border-color: var(--color-success);
+    background: var(--color-success-light);
+  }
+
+  .recommendation-card h3 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .recommendation-step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    width: fit-content;
+  }
+
+  .step-badge.required {
+    background: var(--color-error-light);
+    color: var(--color-error);
+  }
+
+  .step-badge.optional {
+    background: var(--color-warning-light);
+    color: var(--color-warning);
+  }
+
+  .step-badge.recommended {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+
+  .recommendation-step h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .recommendation-step p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .course-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    width: fit-content;
+  }
+
+  .course-link:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: translateX(2px);
+  }
+
+  .roadmap-main {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .roadmap-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .step-item {
+    border-bottom: 1px solid var(--color-border);
+    transition: background var(--transition-fast);
+  }
+
+  .step-item:last-child {
+    border-bottom: none;
+  }
+
+  .step-item:hover {
+    background: var(--color-background);
+  }
+
+  .step-item.completed {
+    background: var(--color-success-light);
+    opacity: 0.7;
+  }
+
+  .step-item.completed:hover {
+    background: var(--color-success-light);
+  }
+
+  .step-item.recommended {
+    border-left: 3px solid var(--color-primary);
+    background: var(--color-primary-light);
+  }
+
+  .step-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .step-checkbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+
+  .step-checkbox input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .checkmark {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step-checkbox input:checked ~ .checkmark {
+    background: var(--color-success);
+    border-color: var(--color-success);
+  }
+
+  .checkmark::after {
+    content: '';
+    display: none;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translateY(-1px);
+  }
+
+  .step-checkbox input:checked ~ .checkmark::after {
+    display: block;
+  }
+
+  .step-item.completed .checkmark {
+    background: var(--color-success);
+    border-color: var(--color-success);
+  }
+
+  .step-item.completed .checkmark::after {
+    display: block;
+  }
+
+  .step-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .step-order {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    flex: 1;
+  }
+
+  .step-item.completed .step-title {
+    text-decoration: line-through;
+    color: var(--color-text-muted);
+  }
+
+  .step-description {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .step-course-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+    padding: 0.375rem 0.625rem;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .step-course-link:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  @media (max-width: 1024px) {
+    .roadmap-detail-content {
+      grid-template-columns: 1fr;
+    }
+
+    .roadmap-sidebar {
+      position: static;
+      max-height: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .roadmap-meta,
+    .progress-section,
+    .recommendation-card {
+      flex: 1;
+      min-width: 280px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .roadmap-detail-page {
+      padding: 0.75rem;
+    }
+
+    .roadmap-sidebar {
+      flex-direction: column;
+    }
+
+    .roadmap-meta,
+    .progress-section,
+    .recommendation-card {
+      min-width: 0;
+    }
+
+    .step-content {
+      padding: 1rem;
+    }
+
+    .step-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .step-order {
+      width: 24px;
+      height: 24px;
+      font-size: 0.7rem;
+    }
+  }
 }
 
 .roadmaps-grid {
