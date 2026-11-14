@@ -50,6 +50,18 @@ export default function RoadmapDetailPage() {
     }
   }, [roadmap, fetchRecommendation]);
 
+  // Load persisted completed steps from localStorage
+  useEffect(() => {
+    const key = `sentinel-lab-roadmap-${roadmapId}-completedSteps`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      setCompletedSteps(new Set(JSON.parse(stored)));
+    } else {
+      setCompletedSteps(new Set());
+    }
+  }, [roadmapId]);
+
+
   const toggleStep = (stepId: number) => {
     setCompletedSteps((prev) => {
       const next = new Set(prev);
@@ -57,6 +69,13 @@ export default function RoadmapDetailPage() {
         next.delete(stepId);
       } else {
         next.add(stepId);
+      }
+      // Persist to localStorage
+      const key = `sentinel-lab-roadmap-${roadmapId}-completedSteps`;
+      if (next.size === 0) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify([...next]));
       }
       return next;
     });

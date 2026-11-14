@@ -498,6 +498,7 @@ def delete_roadmap_step(step_id: int, db: Session = Depends(get_db)):
 
 
 # Roadmap recommendation endpoint
+ # Heuristic-based selection of next step (plain algorithm, not AI). Consider upgrading with AI later.
 @router.post("/roadmaps/{roadmap_id}/recommend", response_model=RoadmapRecommendationResponse)
 def recommend_next_step(
     roadmap_id: int,
