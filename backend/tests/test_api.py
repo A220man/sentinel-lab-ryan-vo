@@ -50,6 +50,16 @@ class TestHealthEndpoint:
         assert data["service"] == "sentinel-lab-ryan-vo"
 
 
+class TestAuthStatus:
+    def test_auth_status_endpoint(self):
+        response = client.get("/auth/status")
+        assert response.status_code == 200
+        data = response.json()
+        assert "oidc_enabled" in data
+        assert "issuer_url" in data
+        assert "client_id" in data
+
+
 class TestCourseEndpoints:
     def test_create_course(self):
         response = client.post(

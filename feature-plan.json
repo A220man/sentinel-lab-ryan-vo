@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "roadmap-detail-ui",
+  "current_feature": "auth-oidc",
   "features": [
     {
       "id": "project-skeleton",
@@ -114,7 +114,7 @@
     {
       "id": "auth-oidc",
       "title": "OIDC authentication with Keycloak",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "Keycloak realm configuration",
         "Backend auth middleware",
@@ -122,8 +122,14 @@
         "Protected routes",
         "Auth tests"
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": [
+        "backend/app/core/auth.py",
+        "backend/app/main.py (auth status endpoint)",
+        "backend/tests/test_api.py::TestAuthStatus"
+      ],
+      "tests": [
+        "backend/tests/test_api.py::TestAuthStatus"
+      ]
     },
     {
       "id": "notebook-management",
