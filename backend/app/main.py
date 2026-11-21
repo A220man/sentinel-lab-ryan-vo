@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.api.routes import router as api_router
+from app.core.auth import oauth2_scheme, get_current_user
 from app.models import Course, Module, Lesson, Roadmap, RoadmapStep
 
 app = FastAPI(
@@ -31,4 +32,14 @@ async def root():
         "name": settings.app_name,
         "version": settings.app_version,
         "description": "LLM Course Platform with Roadmaps and Colab Notebooks",
+    }
+
+
+@app.get("/auth/status")
+async def auth_status():
+    """OIDC auth status endpoint."""
+    return {
+        "oidc_enabled": settings.oidc_enabled,
+        "issuer_url": settings.oidc_issuer_url,
+        "client_id": settings.oidc_client_id,
     }

@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-roadmap-detail-ui
+auth-oidc
 
 ## Roadmap
 
@@ -84,7 +84,7 @@ Tests: `backend/tests/test_api.py::TestRoadmapEndpoints`
 
 ### auth-oidc — OIDC authentication with Keycloak
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - Keycloak realm configuration
@@ -92,6 +92,10 @@ Acceptance:
 - Frontend login/logout flow
 - Protected routes
 - Auth tests
+
+Implementation: `backend/app/core/auth.py`, `backend/app/main.py (auth status endpoint)`, `backend/tests/test_api.py::TestAuthStatus`
+
+Tests: `backend/tests/test_api.py::TestAuthStatus`
 
 ### notebook-management — Notebook import/export and Colab integration
 
