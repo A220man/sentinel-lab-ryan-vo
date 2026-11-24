@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
 
     # OIDC/Keycloak settings
-    oidc_enabled: bool = False
+    oidc_enabled: bool = True
     oidc_issuer_url: Optional[str] = None
     oidc_client_id: Optional[str] = None
     oidc_client_secret: Optional[str] = None
