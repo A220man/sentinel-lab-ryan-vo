@@ -3,6 +3,7 @@ from jose import jwt, JWTError
 from fastapi import Request, HTTPException, Depends
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from pydantic import BaseModel
+from app.core.config import settings
 
 
 class KeycloakUser(BaseModel):
@@ -13,11 +14,11 @@ class KeycloakUser(BaseModel):
 
 
 # OAuth2 scheme configured for Keycloak
-# Token URL and authorization URL will be set per deployment
+# Token URL and authorization URL are set from deployment settings via env vars
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    tokenUrl="",  # Override per deployment
-    authorizationUrl="",  # Override per deployment
-    scopes={},
+    tokenUrl=settings.oidc_redirect_uri or "/token",
+    authorizationUrl=settings.oidc_issuer_url + "/protocol/openid-connect/auth" if settings.oidc_issuer_url else "/auth/keycloak/authorize",
+    scopes={"openid": "OpenID", "profile": "User Profile"},
 )
 
 
